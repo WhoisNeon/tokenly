@@ -1,0 +1,57 @@
+{
+  "name": "tokenly-dashboard",
+  "version": "0.1.0",
+  "private": false,
+  "description": "A dashboard for visualising coding-agent token usage from the ccusage CLI.",
+  "license": "MIT",
+  "author": "Tokenly",
+  "keywords": [
+    "ccusage",
+    "tokens",
+    "usage",
+    "dashboard",
+    "opencode",
+    "claude",
+    "codex"
+  ],
+  "type": "module",
+  "bin": {
+    "tokenly": "bin/tokenly.mjs"
+  },
+  "files": [
+    "app",
+    "components",
+    "lib",
+    "bin",
+    "public",
+    "next.config.mjs",
+    "tsconfig.json",
+    "next-env.d.ts",
+    ".next",
+    "!.next/cache"
+  ],
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "typecheck": "tsc --noEmit",
+    "test": "node --test lib/*.test.ts",
+    "prepublishOnly": "npm run build"
+  },
+  "dependencies": {
+    "next": "^16.4.2",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "recharts": "^3.10.1"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.5",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "typescript": "^5.9.0"
+  },
+  "engines": {
+    "node": ">=18.18.0"
+  }
+}

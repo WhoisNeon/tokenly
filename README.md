@@ -1,12 +1,10 @@
-# Tokenly
+<h1 style="display:flex;align-items:center;gap:8px">Tokenly <img src="public/icon.svg" width="40" height="40"></h1>
 
 A dashboard for visualising coding-agent token usage. It shells out to the
 [`ccusage`](https://www.npmjs.com/package/ccusage) CLI, normalises the JSON it
 returns, and renders daily and monthly breakdowns with charts and tables.
 
 Runs entirely on your machine — nothing leaves it.
-
-![Tokenly](public/icon.svg)
 
 ## Requirements
 

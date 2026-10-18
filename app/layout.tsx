@@ -27,7 +27,14 @@ const themeScript = `try{var t=localStorage.getItem('tokenly-theme');if(t==='dar
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${display.variable} ${sans.variable} ${mono.variable}`}>
+    // The pre-paint script and browser extensions both mutate <html> before React
+    // hydrates (data-theme, data-google-analytics-opt-out, …). React would report
+    // those as a mismatch, so suppress it on this element only.
+    <html
+      lang="en"
+      className={`${display.variable} ${sans.variable} ${mono.variable}`}
+      suppressHydrationWarning
+    >
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>

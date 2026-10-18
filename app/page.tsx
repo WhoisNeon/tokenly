@@ -2,8 +2,23 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import type { CSSProperties } from 'react';
+import {
+  Calendar,
+  CalendarDays,
+  Clock,
+  Coins,
+  Cpu,
+  Database,
+  Inbox,
+  LoaderCircle,
+  RefreshCw,
+  Terminal,
+  TrendingUp,
+  TriangleAlert,
+} from 'lucide-react';
 
 import { Logo } from '@/components/Logo';
+import { Select } from '@/components/Select';
 import { ThemeToggle, useTheme } from '@/components/ThemeToggle';
 import { UsageChart } from '@/components/UsageChart';
 import { UsageTable } from '@/components/UsageTable';
@@ -15,6 +30,16 @@ type State =
   | { status: 'loading' }
   | { status: 'ready'; data: UsagePayload }
   | { status: 'error'; error: ApiError };
+
+const VIEWS = [
+  { value: 'daily', label: 'Daily', icon: Clock },
+  { value: 'monthly', label: 'Monthly', icon: Calendar },
+] as const;
+
+const SOURCE_OPTIONS = SOURCES.map((source) => ({
+  value: source,
+  label: source === 'all' ? 'All sources' : source,
+}));
 
 export default function Dashboard() {
   const [view, setView] = useState<View>('daily');
@@ -53,6 +78,7 @@ export default function Dashboard() {
   const models = [...new Set(rows.flatMap((row) => row.modelsUsed))].sort();
   const bucketLabel = view === 'daily' ? 'Days' : 'Months';
   const stage = (i: number): CSSProperties => ({ '--i': i }) as CSSProperties;
+  const command = source === 'all' ? `ccusage ${view} --json` : `ccusage ${source} ${view} --json`;
 
   return (
     <>
@@ -70,38 +96,39 @@ export default function Dashboard() {
 
           <div className="toolbar">
             <div className="segmented" role="group" aria-label="Time range">
-              {(['daily', 'monthly'] as View[]).map((option) => (
-                <button
-                  key={option}
-                  type="button"
-                  className="btn"
-                  aria-pressed={view === option}
-                  onClick={() => setView(option)}
-                >
-                  {option}
-                </button>
-              ))}
+              {VIEWS.map((option) => {
+                const Icon = option.icon;
+                return (
+                  <button
+                    key={option.value}
+                    type="button"
+                    className="btn"
+                    aria-pressed={view === option.value}
+                    onClick={() => setView(option.value)}
+                  >
+                    <Icon size={13} aria-hidden="true" />
+                    {option.label}
+                  </button>
+                );
+              })}
             </div>
 
-            <label className="label" htmlFor="source">
-              Source
-            </label>
-            <select
-              id="source"
-              className="select"
+            <Select
+              label="Source"
               value={source}
-              onChange={(event) => setSource(event.target.value)}
-            >
-              {SOURCES.map((option) => (
-                <option key={option} value={option}>
-                  {option === 'all' ? 'All sources' : option}
-                </option>
-              ))}
-            </select>
+              options={SOURCE_OPTIONS}
+              onChange={setSource}
+              icon={<Cpu size={14} aria-hidden="true" />}
+            />
 
-            <button type="button" className="btn" onClick={() => load()} title="Refresh">
-              <span aria-hidden="true">⟳</span>
-              <span className="sr-only">Refresh</span>
+            <button
+              type="button"
+              className="btn btn--icon"
+              onClick={() => load()}
+              aria-label="Refresh"
+              title="Refresh"
+            >
+              <RefreshCw size={14} aria-hidden="true" />
             </button>
 
             <ThemeToggle dark={dark} onToggle={toggle} />
@@ -116,13 +143,22 @@ export default function Dashboard() {
               label: 'Total tokens',
               value: formatTokens(data?.totals.totalTokens ?? 0),
               meta: formatExact(data?.totals.totalTokens ?? 0),
+              icon: <Database size={11} aria-hidden="true" />,
             },
-            { label: 'Total cost', value: formatCost(data?.totals.totalCost ?? 0), accent: true },
-            { label: bucketLabel, value: String(rows.length) },
-            { label: 'Peak bucket', value: formatTokens(peak) },
+            {
+              label: 'Total cost',
+              value: formatCost(data?.totals.totalCost ?? 0),
+              accent: true,
+              icon: <Coins size={11} aria-hidden="true" />,
+            },
+            { label: bucketLabel, value: String(rows.length), icon: <CalendarDays size={11} aria-hidden="true" /> },
+            { label: 'Peak bucket', value: formatTokens(peak), icon: <TrendingUp size={11} aria-hidden="true" /> },
           ].map((tile) => (
             <div className={`stat${tile.accent ? ' stat--accent' : ''}`} key={tile.label}>
-              <div className="label">{tile.label}</div>
+              <div className="label">
+                {tile.icon}
+                {tile.label}
+              </div>
               <div className="stat__value">{tile.value}</div>
               {tile.meta && <div className="stat__meta">{tile.meta}</div>}
             </div>
@@ -132,10 +168,12 @@ export default function Dashboard() {
         {state.status === 'error' && (
           <div className="panel reveal" style={stage(1)}>
             <div className="state state--error">
+              <TriangleAlert className="state__icon" size={22} aria-hidden="true" />
               <div className="state__title">Could not read usage</div>
               <p className="state__body">{state.error.error}</p>
               {state.error.hint && <p className="state__hint">{state.error.hint}</p>}
               <button type="button" className="btn" onClick={() => load()}>
+                <RefreshCw size={13} aria-hidden="true" />
                 Try again
               </button>
             </div>
@@ -147,7 +185,7 @@ export default function Dashboard() {
             <div className="panel__head">
               <h2 className="panel__title">Reading ccusage</h2>
               <span className="label">
-                <span className="spinner" style={{ display: 'inline-block', verticalAlign: -2 }} /> running ccusage
+                <LoaderCircle className="spin" size={12} aria-hidden="true" /> running ccusage
               </span>
             </div>
             <div className="skeleton" />
@@ -157,9 +195,11 @@ export default function Dashboard() {
         {state.status === 'ready' && rows.length === 0 && (
           <div className="panel reveal" style={stage(1)}>
             <div className="state">
+              <Inbox className="state__icon" size={22} aria-hidden="true" />
               <div className="state__title">No data yet</div>
               <p className="state__body">
-                {data?.notice ?? `No ${view} usage recorded.`} Start a coding agent session, then refresh.
+                {data?.notice ?? `No ${view} usage recorded.`} Start a coding agent session, then
+                refresh.
               </p>
             </div>
           </div>
@@ -196,12 +236,9 @@ export default function Dashboard() {
       </main>
 
       <footer className="footer">
-        <span>
-          Powered by <code>ccusage</code>
-        </span>
-        <span aria-hidden="true">·</span>
-        <span>
-          <code>{source === 'all' ? `ccusage ${view} --json` : `ccusage ${source} ${view} --json`}</code>
+        <span className="footer__cmd">
+          <Terminal size={11} aria-hidden="true" />
+          <code>{command}</code>
         </span>
       </footer>
     </>

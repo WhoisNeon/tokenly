@@ -1,9 +1,11 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { Moon, Sun } from 'lucide-react';
 
 const KEY = 'tokenly-theme';
 
+/** Resolves after mount so server and client render the same markup. */
 export function useTheme() {
   const [dark, setDark] = useState(false);
 
@@ -29,12 +31,12 @@ export function ThemeToggle({ dark, onToggle }: { dark: boolean; onToggle: () =>
   return (
     <button
       type="button"
-      className="btn"
+      className="btn btn--icon"
       onClick={onToggle}
       aria-label={`Switch to ${dark ? 'light' : 'dark'} theme`}
       title={`Switch to ${dark ? 'light' : 'dark'} theme`}
     >
-      <span aria-hidden="true">{dark ? '◑' : '◐'}</span>
+      {dark ? <Sun size={14} aria-hidden="true" /> : <Moon size={14} aria-hidden="true" />}
     </button>
   );
 }

@@ -43,6 +43,20 @@ The dropdown maps directly onto the CLI:
 
 The footer always shows the command that produced the current view.
 
+### Keyboard
+
+The source dropdown is a custom listbox, not a native `<select>`:
+
+| Key                      | Action                   |
+| ------------------------ | ------------------------ |
+| `ArrowDown` / `ArrowUp`  | Open the menu, then move |
+| `Home` / `End`           | First / last option      |
+| `Enter` / `Space`        | Select and close         |
+| `Escape` / `Tab`         | Close, keeping the value |
+
+Clicking outside the menu also closes it. The current selection is marked with a
+check.
+
 ## How it works
 
 ```

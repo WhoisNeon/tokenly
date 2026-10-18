@@ -1,4 +1,4 @@
-<h1 style="display:flex;align-items:center;gap:8px">Tokenly <img src="public/icon.svg" width="40" height="40"></h1>
+<h1 align="center"><img src="public/icon.svg" width="40" height="40" alt="" style="vertical-align:middle"> Tokenly</h1>
 
 A dashboard for visualising coding-agent token usage. It shells out to the
 [`ccusage`](https://www.npmjs.com/package/ccusage) CLI, normalises the JSON it

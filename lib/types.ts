@@ -55,6 +55,8 @@ export type UsageTotals = {
   cacheReadTokens: number;
   totalTokens: number;
   totalCost: number;
+  /** Models ccusage has no price for; their tokens are counted at $0. */
+  unpricedModels: string[];
 };
 
 export type UsagePayload = {
@@ -69,4 +71,26 @@ export type UsagePayload = {
 export type ApiError = {
   error: string;
   hint?: string;
+};
+
+/**
+ * A model's price override, in dollars per million tokens. ccusage stores the
+ * raw per-token rate, but nobody prices anything in 0.000003 dollars.
+ */
+export type ModelPrice = {
+  model: string;
+  input: number;
+  output: number;
+  cacheRead: number;
+  cacheCreation: number;
+};
+
+export type PricingPayload = {
+  /** Absolute path of the ccusage config file that was read. */
+  path: string;
+  /** True when the file does not exist yet and will be created on save. */
+  missing: boolean;
+  prices: ModelPrice[];
+  /** Agents whose own config block sets prices, overriding `defaults`. */
+  agentOverrides: string[];
 };

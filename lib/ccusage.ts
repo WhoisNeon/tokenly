@@ -55,6 +55,7 @@ function normalizeTotals(raw: unknown): UsageTotals {
     cacheReadTokens: num(t.cacheReadTokens),
     totalTokens: num(t.totalTokens),
     totalCost: num(t.totalCost),
+    unpricedModels: strList(t.unpricedModels),
   };
 }
 

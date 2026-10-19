@@ -5,6 +5,7 @@ import type { CSSProperties } from 'react';
 import {
   Calendar,
   CalendarDays,
+  ChartColumn,
   Clock,
   Coins,
   Cpu,
@@ -12,12 +13,14 @@ import {
   Inbox,
   LoaderCircle,
   RefreshCw,
+  Settings,
   Terminal,
   TrendingUp,
   TriangleAlert,
 } from 'lucide-react';
 
 import { Logo } from '@/components/Logo';
+import { PricingEditor } from '@/components/PricingEditor';
 import { Select } from '@/components/Select';
 import { ThemeToggle, useTheme } from '@/components/ThemeToggle';
 import { UsageChart } from '@/components/UsageChart';
@@ -30,6 +33,8 @@ type State =
   | { status: 'loading' }
   | { status: 'ready'; data: UsagePayload }
   | { status: 'error'; error: ApiError };
+
+type Tab = 'usage' | 'settings';
 
 const VIEWS = [
   { value: 'daily', label: 'Daily', icon: Clock },
@@ -44,6 +49,7 @@ const SOURCE_OPTIONS = SOURCES.map((source) => ({
 export default function Dashboard() {
   const [view, setView] = useState<View>('daily');
   const [source, setSource] = useState<string>('all');
+  const [tab, setTab] = useState<Tab>('usage');
   const [state, setState] = useState<State>({ status: 'loading' });
   const { dark, toggle } = useTheme();
 
@@ -95,41 +101,66 @@ export default function Dashboard() {
           </a>
 
           <div className="toolbar">
-            <div className="segmented" role="group" aria-label="Time range">
-              {VIEWS.map((option) => {
-                const Icon = option.icon;
-                return (
-                  <button
-                    key={option.value}
-                    type="button"
-                    className="btn"
-                    aria-pressed={view === option.value}
-                    onClick={() => setView(option.value)}
-                  >
-                    <Icon size={13} aria-hidden="true" />
-                    {option.label}
-                  </button>
-                );
-              })}
+            <div className="segmented" role="group" aria-label="View">
+              <button
+                type="button"
+                className="btn"
+                aria-pressed={tab === 'usage'}
+                onClick={() => setTab('usage')}
+              >
+                <ChartColumn size={13} aria-hidden="true" />
+                Usage
+              </button>
+              <button
+                type="button"
+                className="btn"
+                aria-pressed={tab === 'settings'}
+                onClick={() => setTab('settings')}
+              >
+                <Settings size={13} aria-hidden="true" />
+                Settings
+              </button>
             </div>
 
-            <Select
-              label="Source"
-              value={source}
-              options={SOURCE_OPTIONS}
-              onChange={setSource}
-              icon={<Cpu size={14} aria-hidden="true" />}
-            />
+            {tab === 'usage' && (
+              <>
+                <div className="segmented" role="group" aria-label="Time range">
+                  {VIEWS.map((option) => {
+                    const Icon = option.icon;
+                    return (
+                      <button
+                        key={option.value}
+                        type="button"
+                        className="btn"
+                        aria-pressed={view === option.value}
+                        onClick={() => setView(option.value)}
+                      >
+                        <Icon size={13} aria-hidden="true" />
+                        {option.label}
+                      </button>
+                    );
+                  })}
+                </div>
 
-            <button
-              type="button"
-              className="btn btn--icon"
-              onClick={() => load()}
-              aria-label="Refresh"
-              title="Refresh"
-            >
-              <RefreshCw size={14} aria-hidden="true" />
-            </button>
+                <Select
+                  label="Source"
+                  value={source}
+                  options={SOURCE_OPTIONS}
+                  onChange={setSource}
+                  icon={<Cpu size={14} aria-hidden="true" />}
+                />
+
+                <button
+                  type="button"
+                  className="btn btn--icon"
+                  onClick={() => load()}
+                  aria-label="Refresh"
+                  title="Refresh"
+                >
+                  <RefreshCw size={14} aria-hidden="true" />
+                </button>
+              </>
+            )}
 
             <ThemeToggle dark={dark} onToggle={toggle} />
           </div>
@@ -137,100 +168,114 @@ export default function Dashboard() {
       </header>
 
       <main className="shell">
-        <section className="stats reveal" style={stage(0)} aria-label="Summary">
-          {[
-            {
-              label: 'Total tokens',
-              value: formatTokens(data?.totals.totalTokens ?? 0),
-              meta: formatExact(data?.totals.totalTokens ?? 0),
-              icon: <Database size={11} aria-hidden="true" />,
-            },
-            {
-              label: 'Total cost',
-              value: formatCost(data?.totals.totalCost ?? 0),
-              accent: true,
-              icon: <Coins size={11} aria-hidden="true" />,
-            },
-            { label: bucketLabel, value: String(rows.length), icon: <CalendarDays size={11} aria-hidden="true" /> },
-            { label: 'Peak bucket', value: formatTokens(peak), icon: <TrendingUp size={11} aria-hidden="true" /> },
-          ].map((tile) => (
-            <div className={`stat${tile.accent ? ' stat--accent' : ''}`} key={tile.label}>
-              <div className="label">
-                {tile.icon}
-                {tile.label}
-              </div>
-              <div className="stat__value">{tile.value}</div>
-              {tile.meta && <div className="stat__meta">{tile.meta}</div>}
-            </div>
-          ))}
-        </section>
-
-        {state.status === 'error' && (
-          <div className="panel reveal" style={stage(1)}>
-            <div className="state state--error">
-              <TriangleAlert className="state__icon" size={22} aria-hidden="true" />
-              <div className="state__title">Could not read usage</div>
-              <p className="state__body">{state.error.error}</p>
-              {state.error.hint && <p className="state__hint">{state.error.hint}</p>}
-              <button type="button" className="btn" onClick={() => load()}>
-                <RefreshCw size={13} aria-hidden="true" />
-                Try again
-              </button>
-            </div>
-          </div>
-        )}
-
-        {state.status === 'loading' && (
-          <div className="panel reveal" style={stage(1)}>
-            <div className="panel__head">
-              <h2 className="panel__title">Reading ccusage</h2>
-              <span className="label">
-                <LoaderCircle className="spin" size={12} aria-hidden="true" /> running ccusage
-              </span>
-            </div>
-            <div className="skeleton" />
-          </div>
-        )}
-
-        {state.status === 'ready' && rows.length === 0 && (
-          <div className="panel reveal" style={stage(1)}>
-            <div className="state">
-              <Inbox className="state__icon" size={22} aria-hidden="true" />
-              <div className="state__title">No data yet</div>
-              <p className="state__body">
-                {data?.notice ?? `No ${view} usage recorded.`} Start a coding agent session, then
-                refresh.
-              </p>
-            </div>
-          </div>
-        )}
-
-        {data && rows.length > 0 && (
+        {tab === 'settings' ? (
+          <PricingEditor unpriced={data?.totals.unpricedModels ?? []} onSaved={() => load()} />
+        ) : (
           <>
-            <section className="panel reveal" style={stage(1)}>
-              <div className="panel__head">
-                <h2 className="panel__title">
-                  {view === 'daily' ? 'Tokens & cost per day' : 'Tokens & cost per month'}
-                </h2>
-                <span className="label">
-                  {models.length} model{models.length === 1 ? '' : 's'} ·{' '}
-                  {source === 'all' ? 'all sources' : source}
-                </span>
-              </div>
-              <UsageChart rows={rows} view={view} dark={dark} />
+            <section className="stats reveal" style={stage(0)} aria-label="Summary">
+              {[
+                {
+                  label: 'Total tokens',
+                  value: formatTokens(data?.totals.totalTokens ?? 0),
+                  meta: formatExact(data?.totals.totalTokens ?? 0),
+                  icon: <Database size={11} aria-hidden="true" />,
+                },
+                {
+                  label: 'Total cost',
+                  value: formatCost(data?.totals.totalCost ?? 0),
+                  accent: true,
+                  icon: <Coins size={11} aria-hidden="true" />,
+                },
+                {
+                  label: bucketLabel,
+                  value: String(rows.length),
+                  icon: <CalendarDays size={11} aria-hidden="true" />,
+                },
+                {
+                  label: 'Peak bucket',
+                  value: formatTokens(peak),
+                  icon: <TrendingUp size={11} aria-hidden="true" />,
+                },
+              ].map((tile) => (
+                <div className={`stat${tile.accent ? ' stat--accent' : ''}`} key={tile.label}>
+                  <div className="label">
+                    {tile.icon}
+                    {tile.label}
+                  </div>
+                  <div className="stat__value">{tile.value}</div>
+                  {tile.meta && <div className="stat__meta">{tile.meta}</div>}
+                </div>
+              ))}
             </section>
 
-            <section className="panel reveal" style={{ ...stage(2), marginTop: 22 }}>
-              <div className="panel__head">
-                <h2 className="panel__title">
-                  {view === 'daily' ? 'Daily breakdown' : 'Monthly breakdown'}
-                </h2>
-                <span className="label">
-                  {rows.length} {bucketLabel.toLowerCase()}
-                </span>
+            {state.status === 'error' && (
+              <div className="panel reveal" style={stage(1)}>
+                <div className="state state--error">
+                  <TriangleAlert className="state__icon" size={22} aria-hidden="true" />
+                  <div className="state__title">Could not read usage</div>
+                  <p className="state__body">{state.error.error}</p>
+                  {state.error.hint && <p className="state__hint">{state.error.hint}</p>}
+                  <button type="button" className="btn" onClick={() => load()}>
+                    <RefreshCw size={13} aria-hidden="true" />
+                    Try again
+                  </button>
+                </div>
               </div>
-              <UsageTable rows={rows} totals={data.totals} view={view} />
-            </section>
+            )}
+
+            {state.status === 'loading' && (
+              <div className="panel reveal" style={stage(1)}>
+                <div className="panel__head">
+                  <h2 className="panel__title">Reading ccusage</h2>
+                  <span className="label">
+                    <LoaderCircle className="spin" size={12} aria-hidden="true" /> running ccusage
+                  </span>
+                </div>
+                <div className="skeleton" />
+              </div>
+            )}
+
+            {state.status === 'ready' && rows.length === 0 && (
+              <div className="panel reveal" style={stage(1)}>
+                <div className="state">
+                  <Inbox className="state__icon" size={22} aria-hidden="true" />
+                  <div className="state__title">No data yet</div>
+                  <p className="state__body">
+                    {data?.notice ?? `No ${view} usage recorded.`} Start a coding agent session, then
+                    refresh.
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {data && rows.length > 0 && (
+              <>
+                <section className="panel reveal" style={stage(1)}>
+                  <div className="panel__head">
+                    <h2 className="panel__title">
+                      {view === 'daily' ? 'Tokens & cost per day' : 'Tokens & cost per month'}
+                    </h2>
+                    <span className="label">
+                      {models.length} model{models.length === 1 ? '' : 's'} ·{' '}
+                      {source === 'all' ? 'all sources' : source}
+                    </span>
+                  </div>
+                  <UsageChart rows={rows} view={view} dark={dark} />
+                </section>
+
+                <section className="panel reveal" style={{ ...stage(2), marginTop: 22 }}>
+                  <div className="panel__head">
+                    <h2 className="panel__title">
+                      {view === 'daily' ? 'Daily breakdown' : 'Monthly breakdown'}
+                    </h2>
+                    <span className="label">
+                      {rows.length} {bucketLabel.toLowerCase()}
+                    </span>
+                  </div>
+                  <UsageTable rows={rows} totals={data.totals} view={view} />
+                </section>
+              </>
+            )}
           </>
         )}
       </main>

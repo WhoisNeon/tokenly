@@ -267,6 +267,28 @@ body::after {
   border-color: var(--accent);
 }
 
+.btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.btn--primary {
+  color: var(--accent-contrast);
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+.btn--primary:hover:not(:disabled) {
+  color: var(--accent-contrast);
+  filter: brightness(1.08);
+}
+
+.btn--primary:disabled {
+  color: var(--ink-2);
+  background: var(--surface-2);
+  border-color: var(--line);
+}
+
 /* ---------- header ---------- */
 
 .masthead {
@@ -756,6 +778,183 @@ tbody tr:hover .row-head {
 .cell-strong {
   color: var(--ink);
   font-weight: 600;
+}
+
+/* ---------- pricing editor ---------- */
+
+.pricing {
+  padding: 18px 20px 20px;
+}
+
+.pricing__note {
+  font-size: 13px;
+  color: var(--muted);
+  margin-bottom: 16px;
+  max-width: 72ch;
+}
+
+/* Models ccusage has no price for. Each one is a shortcut into the table. */
+.pricing__unpriced {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+.pricing__unpriced-label {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.chip--action {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  cursor: pointer;
+  font-family: var(--font-mono);
+  transition: color 0.15s, border-color 0.15s;
+}
+
+.chip--action:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+.pricing__table {
+  table-layout: fixed;
+  min-width: 720px;
+}
+
+.pricing__table thead th {
+  background: var(--surface-2);
+}
+
+.pricing__table thead th:first-child {
+  width: 36%;
+}
+
+.pricing__path {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--muted);
+  word-break: break-all;
+  text-align: right;
+}
+
+.pricing__table td {
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--line);
+}
+
+.pricing__table tbody td:first-child {
+  padding-left: 0;
+}
+
+.pricing__table tbody td:last-child {
+  padding-right: 0;
+  width: 40px;
+}
+
+.pricing__table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.pricing__model {
+  width: 38%;
+}
+
+/* Fields sit flush against each other so the row reads as one instrument
+   panel rather than a row of boxes. */
+.pricing__table input {
+  width: 100%;
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 12.5px;
+  color: var(--ink);
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: 0;
+  padding: 7px 9px;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.pricing__table input:hover {
+  border-color: var(--line-strong);
+}
+
+.pricing__table input:focus {
+  outline: none;
+  border-color: var(--accent);
+  background: var(--surface);
+  box-shadow: 0 0 0 2px var(--accent-soft);
+}
+
+.pricing__table input::placeholder {
+  color: var(--muted);
+  opacity: 0.6;
+}
+
+.pricing__num {
+  text-align: right;
+}
+
+.pricing__remove {
+  text-align: right;
+}
+
+.pricing__empty {
+  padding: 22px 0 !important;
+  text-align: left !important;
+  color: var(--muted);
+  font-family: var(--font-body) !important;
+  font-size: 13px !important;
+}
+
+.pricing__actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 18px;
+  padding-top: 16px;
+  border-top: 1px solid var(--line);
+}
+
+.pricing__status {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.pricing__error,
+.pricing__ok {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.pricing__error {
+  color: var(--danger);
+}
+
+.pricing__ok {
+  color: var(--accent);
+}
+
+.state__hint--warn {
+  color: var(--ink-2);
+  background: var(--accent-soft);
+  border-color: color-mix(in srgb, var(--accent) 30%, transparent);
+  margin-bottom: 16px;
 }
 
 /* ---------- states ---------- */

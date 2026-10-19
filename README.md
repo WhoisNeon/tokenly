@@ -48,7 +48,7 @@ Everything runs on your machine. Tokenly reads your usage history from disk and 
 
 ## Usage
 
-Pick **Daily** or **Monthly**, then use the **Source** dropdown to scope the report to a single agent (`opencode`, `claude`, `codex`, `gemini`, and 14 more) or leave it on **All sources**.
+The **Usage** tab picks **Daily** or **Monthly**, then use the **Source** dropdown to scope the report to a single agent (`opencode`, `claude`, `codex`, `gemini`, and 14 more) or leave it on **All sources**.
 
 The dropdown maps directly onto the CLI:
 
@@ -74,27 +74,64 @@ The source dropdown is a custom listbox, not a native `<select>`:
 
 Clicking outside the menu also closes it, and the current selection is marked with a check.
 
+## Settings
+
+The **Settings** tab edits the prices `ccusage` charges for each model. It reads and writes
+
+```
+~/.config/claude/ccusage.json
+```
+
+the same file the `ccusage` CLI discovers on its own, so a saved price changes every cost on the
+dashboard with no restart and no extra flag.
+
+| Column        | ccusage field                     |
+| ------------- | --------------------------------- |
+| Input         | `inputCostPerToken`               |
+| Output        | `outputCostPerToken`              |
+| Cache read    | `cacheReadInputTokenCost`         |
+| Cache write   | `cacheCreationInputTokenCost`     |
+
+Prices are entered as **dollars per million tokens** (`3` means $3 per million) and written as
+per-token rates, which is what the config file stores. Every field of a row is written on save,
+because a `ccusage` override replaces a model's whole price entry rather than merging into it.
+
+Models `ccusage` has no price for are listed under **No price yet**; clicking one adds a row for
+it. Saving re-runs `ccusage` and refreshes the dashboard.
+
+Two things the editor leaves alone, on purpose:
+
+- Other keys in the config file. Only `defaults.pricingOverrides` is rewritten.
+- Per-agent price overrides. If an agent sets its own prices they win over the defaults, so the
+  Settings tab says so rather than pretending to have changed them.
+
 ## How it works
 
 ```
 app/api/usage/route.ts   GET /api/usage?view=daily|monthly&source=all|opencode|…
+app/api/pricing/route.ts GET, POST /api/pricing — read and write the ccusage config
 lib/ccusage.ts           spawns the CLI, parses JSON, normalises the rows
+lib/pricing.ts           reads and writes ~/.config/claude/ccusage.json
 app/page.tsx             dashboard: fetch, state, charts, tables
+components/PricingEditor.tsx  the price table
 ```
 
 The two CLI report shapes are not identical. The unified report labels its buckets `period`, while a per-source report uses `date` (daily) or `month` (monthly). `lib/ccusage.ts` flattens all three into a single `period` key so the frontend never has to care which shape it received.
 
 Only `view` and `source` ever reach the shell, and both are matched against a fixed allowlist before a command is built. `lib/ccusage.test.ts` covers that boundary.
 
+The Settings tab never shells out. `lib/pricing.ts` reads and writes the config file directly, so
+there is no command to inject anything into.
+
 ## Scripts
 
-| Script              | Does                           |
-| ------------------- | ------------------------------ |
-| `npm run dev`       | Dev server on :3000            |
-| `npm run build`     | Production build               |
-| `npm start`         | Serve the production build     |
-| `npm test`          | Unit tests for the CLI adapter |
-| `npm run typecheck` | `tsc --noEmit`                 |
+| Script              | Does                                    |
+| ------------------- | --------------------------------------- |
+| `npm run dev`       | Dev server on :3000                     |
+| `npm run build`     | Production build                        |
+| `npm start`         | Serve the production build              |
+| `npm test`          | Unit tests for the CLI and config adapter |
+| `npm run typecheck` | `tsc --noEmit`                          |
 
 ## Error handling
 
@@ -105,12 +142,15 @@ Only `view` and `source` ever reach the shell, and both are matched against a fi
 | The CLI returns invalid JSON          | "ccusage returned output that is not valid JSON." + debug hint   |
 | The CLI exits non-zero or times out   | The first line of stderr (30s timeout)                           |
 | Unknown `view` or `source`            | HTTP 400 listing the valid values                                |
+| The config file is not valid JSON     | The parse error, and the file is left alone                       |
+| A price is negative                   | The row is rejected and the file is not written                   |
 
 ## Notes
 
 - Charts animate once on mount; switching filters is instant.
 - The theme follows your OS by default and can be overridden from the header, which is stored in `localStorage`.
 - Data is read live on every request, so it is never cached or stale. A cold `ccusage` run takes about a second.
+- Tokenly only reads and writes `~/.config/claude/ccusage.json`. It never touches your usage data.
 
 ## License
 

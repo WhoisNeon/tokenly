@@ -16,13 +16,14 @@
 
 ## Screenshots
 
-<p align="center">
-  <img src="docs/screenshot-dark.png" width="820" alt="Daily view in dark mode, showing stacked token bars and a per-day breakdown table" />
-</p>
+|                                                |                                              |
+| ---------------------------------------------- | -------------------------------------------- |
+| <img src="docs/screenshot-daily-dark.png" alt="The daily report across every agent, in dark mode" width="100%" /> | <img src="docs/screenshot-source-light.png" alt="The daily report for a single agent, in light mode" width="100%" /> |
+| **Daily, every agent** — tokens per day, split by input, output and cache. | **One agent** — the same report scoped to a single source. |
+| <img src="docs/screenshot-sources-light.png" alt="The source dropdown open, showing a mark for every agent" width="100%" /> | <img src="docs/screenshot-settings-dark.png" alt="The Settings tab with the model price table" width="100%" /> |
+| **The source picker** — every agent has a mark; the check marks the current one. | **Settings** — model prices, written straight to the ccusage config. |
 
-<p align="center">
-  <img src="docs/screenshot-light.png" width="820" alt="The same daily view in light mode" />
-</p>
+<br />
 
 ## Requirements
 
@@ -50,6 +51,16 @@ Everything runs on your machine. Tokenly reads your usage history from disk and 
 
 The **Usage** tab picks **Daily** or **Monthly**, then use the **Source** dropdown to scope the report to a single agent (`opencode`, `claude`, `codex`, `gemini`, and 14 more) or leave it on **All sources**.
 
+Every choice has a URL of its own, so a report can be linked to or reloaded as it is:
+
+| URL                     | Report                                    |
+| ----------------------- | ----------------------------------------- |
+| `/usage/daily/all`      | Every agent, grouped by day               |
+| `/usage/monthly/all`    | Every agent, grouped by month             |
+| `/usage/daily/claude`   | Claude Code only, grouped by day           |
+| `/usage/monthly/claude` | Claude Code only, grouped by month         |
+| `/settings`             | The price editor                          |
+
 The dropdown maps directly onto the CLI:
 
 | Selection   | Command                         |
@@ -72,7 +83,9 @@ The source dropdown is a custom listbox, not a native `<select>`:
 | `Enter` / `Space`       | Select and close         |
 | `Escape` / `Tab`        | Close, keeping the value |
 
-Clicking outside the menu also closes it, and the current selection is marked with a check.
+Clicking outside the menu also closes it, and the current selection is marked with a check. Every
+agent has a mark — a set of monochrome SVGs served from jsDelivr — so the agents are told apart at
+a glance without reading their names.
 
 ## Settings
 
@@ -108,11 +121,14 @@ Two things the editor leaves alone, on purpose:
 ## How it works
 
 ```
+app/usage/[view]/[source]/page.tsx  the report for one URL
+app/settings/page.tsx              the price editor
 app/api/usage/route.ts   GET /api/usage?view=daily|monthly&source=all|opencode|…
 app/api/pricing/route.ts GET, POST /api/pricing — read and write the ccusage config
 lib/ccusage.ts           spawns the CLI, parses JSON, normalises the rows
 lib/pricing.ts           reads and writes ~/.config/claude/ccusage.json
-app/page.tsx             dashboard: fetch, state, charts, tables
+components/AppShell.tsx  header, navigation, footer
+components/UsageView.tsx the report: fetch, state, charts, tables
 components/PricingEditor.tsx  the price table
 ```
 

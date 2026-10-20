@@ -242,6 +242,7 @@ body::after {
   font-size: 11px;
   letter-spacing: 0.1em;
   text-transform: uppercase;
+  text-decoration: none;
   color: var(--ink-2);
   background: var(--surface);
   border: 1px solid var(--line);
@@ -261,6 +262,7 @@ body::after {
 }
 
 .btn[aria-pressed='true'],
+.btn[aria-current='page'],
 .btn[data-active='true'] {
   color: var(--accent-contrast);
   background: var(--accent);
@@ -314,9 +316,14 @@ body::after {
   display: flex;
   align-items: center;
   gap: 11px;
-  margin-right: auto;
   text-decoration: none;
   color: inherit;
+}
+
+/* The section switch sits between the brand and the filters, and pushes
+   them apart: brand left, navigation next to it, filters on the right. */
+.masthead__nav {
+  margin-right: auto;
 }
 
 .brand__word {
@@ -376,22 +383,7 @@ body::after {
   align-items: stretch;
 }
 
-.select__icon {
-  display: grid;
-  place-items: center;
-  padding: 0 0 0 10px;
-  color: var(--muted);
-  background: var(--surface);
-  border: 1px solid var(--line);
-  border-right: 0;
-  border-radius: var(--radius) 0 0 var(--radius);
-  pointer-events: none;
-}
-
-.select:has(.select__icon) .select__trigger {
-  border-left: 0;
-}
-
+/* One border around the whole control, not one per part. */
 .select__trigger {
   appearance: none;
   display: inline-flex;
@@ -410,12 +402,29 @@ body::after {
   transition: border-color 0.15s;
 }
 
-.select__icon + .select__trigger {
-  border-radius: 0 var(--radius) var(--radius) 0;
-}
-
 .select__trigger:hover {
   border-color: var(--line-strong);
+}
+
+/* The agent mark. LobeHub's marks are monochrome, so they are masked and
+   painted with whatever colour the text around them is. */
+.select__lead {
+  display: inline-flex;
+  align-items: center;
+  flex: none;
+}
+
+.source-icon {
+  display: inline-block;
+  width: 15px;
+  height: 15px;
+  flex: none;
+}
+
+/* Only the masked marks need a background to paint with. The Lucide ones
+   carry their own strokes and would be hidden by it. */
+.source-icon--mask {
+  background-color: currentColor;
 }
 
 .select__value {
@@ -468,7 +477,7 @@ body::after {
 .select__option {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 9px;
   font-family: var(--font-mono);
   font-size: 11px;
   letter-spacing: 0.06em;
@@ -480,6 +489,11 @@ body::after {
   white-space: nowrap;
 }
 
+.select__label {
+  flex: 1;
+  text-align: left;
+}
+
 .select__option[data-active='true'] {
   background: var(--surface-2);
   color: var(--ink);
@@ -489,6 +503,7 @@ body::after {
   color: var(--accent);
 }
 
+/* The check sits on the right, opposite the mark. */
 .select__check {
   display: grid;
   place-items: center;
@@ -775,6 +790,30 @@ tbody tr:hover .row-head {
   margin-right: 4px;
 }
 
+/* A row's agents are shown as marks rather than names. */
+.chip--agents {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 1px 5px;
+  vertical-align: middle;
+}
+
+.chip--agents .source-icon {
+  width: 12px;
+  height: 12px;
+}
+
+/* An agent with no mark of its own keeps its name. */
+.source-icon--text {
+  width: auto;
+  height: auto;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  line-height: 1.2;
+  letter-spacing: 0.04em;
+}
+
 .cell-strong {
   color: var(--ink);
   font-weight: 600;
@@ -783,7 +822,7 @@ tbody tr:hover .row-head {
 /* ---------- pricing editor ---------- */
 
 .pricing {
-  padding: 18px 20px 20px;
+  padding: 18px 20px 16px;
 }
 
 .pricing__note {
@@ -824,17 +863,10 @@ tbody tr:hover .row-head {
   border-color: var(--accent);
 }
 
+/* The price table is the usage table, with editable cells: same head, same
+   row rhythm, same footer. */
 .pricing__table {
-  table-layout: fixed;
-  min-width: 720px;
-}
-
-.pricing__table thead th {
-  background: var(--surface-2);
-}
-
-.pricing__table thead th:first-child {
-  width: 36%;
+  min-width: 760px;
 }
 
 .pricing__path {
@@ -845,57 +877,46 @@ tbody tr:hover .row-head {
   text-align: right;
 }
 
-.pricing__table td {
-  padding: 6px 8px;
-  border-bottom: 1px solid var(--line);
-}
-
 .pricing__table tbody td:first-child {
-  padding-left: 0;
+  text-align: left;
 }
 
 .pricing__table tbody td:last-child {
-  padding-right: 0;
-  width: 40px;
-}
-
-.pricing__table tbody tr:last-child td {
-  border-bottom: 0;
+  width: 48px;
 }
 
 .pricing__model {
-  width: 38%;
+  width: 34%;
 }
 
-/* Fields sit flush against each other so the row reads as one instrument
-   panel rather than a row of boxes. */
+/* The fields sit in the cells like the numbers beside them: no boxes, just
+   a rule that appears when you reach for them. */
 .pricing__table input {
   width: 100%;
   font-family: var(--font-mono);
   font-variant-numeric: tabular-nums;
-  font-size: 12.5px;
+  font-size: 13px;
   color: var(--ink);
-  background: var(--surface-2);
-  border: 1px solid var(--line);
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid transparent;
   border-radius: 0;
-  padding: 7px 9px;
-  transition: border-color 0.15s, background 0.15s;
+  padding: 3px 2px;
+  transition: border-color 0.15s;
 }
 
 .pricing__table input:hover {
-  border-color: var(--line-strong);
+  border-bottom-color: var(--line-strong);
 }
 
 .pricing__table input:focus {
   outline: none;
-  border-color: var(--accent);
-  background: var(--surface);
-  box-shadow: 0 0 0 2px var(--accent-soft);
+  border-bottom-color: var(--accent);
 }
 
 .pricing__table input::placeholder {
   color: var(--muted);
-  opacity: 0.6;
+  opacity: 0.55;
 }
 
 .pricing__num {
@@ -907,7 +928,7 @@ tbody tr:hover .row-head {
 }
 
 .pricing__empty {
-  padding: 22px 0 !important;
+  padding: 22px 16px !important;
   text-align: left !important;
   color: var(--muted);
   font-family: var(--font-body) !important;
@@ -919,9 +940,7 @@ tbody tr:hover .row-head {
   align-items: center;
   gap: 12px;
   flex-wrap: wrap;
-  margin-top: 18px;
-  padding-top: 16px;
-  border-top: 1px solid var(--line);
+  padding: 16px 20px 18px;
 }
 
 .pricing__status {
@@ -955,6 +974,17 @@ tbody tr:hover .row-head {
   background: var(--accent-soft);
   border-color: color-mix(in srgb, var(--accent) 30%, transparent);
   margin-bottom: 16px;
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type=number] {
+  appearance: textfield;
+  -moz-appearance: textfield;
 }
 
 /* ---------- states ---------- */
@@ -1074,7 +1104,12 @@ tbody tr:hover .row-head {
 
   .toolbar {
     width: 100%;
-    justify-content: space-between;
+    justify-content: flex-start;
+  }
+
+  /* The theme toggle is always last in the toolbar; keep it on the right. */
+  .toolbar > .btn--icon:last-child {
+    margin-left: auto;
   }
 
   .shell {

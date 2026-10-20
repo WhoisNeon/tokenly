@@ -4,7 +4,7 @@ import { useEffect, useId, useRef, useState } from 'react';
 import type { KeyboardEvent as ReactKeyboardEvent, ReactNode } from 'react';
 import { Check, ChevronDown } from 'lucide-react';
 
-export type SelectOption = { value: string; label: string };
+export type SelectOption = { value: string; label: string; icon?: ReactNode };
 
 /**
  * Replaces a native <select>. Keyboard: ArrowUp/Down move (and open),
@@ -16,13 +16,11 @@ export function Select({
   value,
   options,
   onChange,
-  icon,
 }: {
   label: string;
   value: string;
   options: SelectOption[];
   onChange: (value: string) => void;
-  icon?: ReactNode;
 }) {
   const [open, setOpen] = useState(false);
   const [highlight, setHighlight] = useState(0);
@@ -35,6 +33,7 @@ export function Select({
     0,
     options.findIndex((option) => option.value === value),
   );
+  const selected = options[selectedIndex];
 
   useEffect(() => {
     if (open) setHighlight(selectedIndex);
@@ -112,7 +111,8 @@ export function Select({
 
   return (
     <div className="select" ref={root} onKeyDown={onKeyDown}>
-      {icon && <span className="select__icon">{icon}</span>}
+      {/* One button for the whole control, icon included — clicking the icon
+          must open the menu, not just the text. */}
       <button
         ref={trigger}
         type="button"
@@ -123,7 +123,8 @@ export function Select({
         aria-label={label}
         onClick={() => setOpen((previous) => !previous)}
       >
-        <span className="select__value">{options[selectedIndex]?.label}</span>
+        {selected?.icon && <span className="select__lead">{selected.icon}</span>}
+        <span className="select__value">{selected?.label}</span>
         <ChevronDown className="select__caret" size={14} aria-hidden="true" data-open={open} />
       </button>
 
@@ -146,10 +147,11 @@ export function Select({
             onClick={() => commit(index)}
             onMouseEnter={() => setHighlight(index)}
           >
+            {option.icon && <span className="select__lead">{option.icon}</span>}
+            <span className="select__label">{option.label}</span>
             <span className="select__check" aria-hidden="true">
               {option.value === value && <Check size={13} strokeWidth={3} />}
             </span>
-            {option.label}
           </li>
         ))}
       </ul>

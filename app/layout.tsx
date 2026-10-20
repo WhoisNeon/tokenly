@@ -1,6 +1,8 @@
 import type { Metadata, Viewport } from 'next';
 import { IBM_Plex_Mono, IBM_Plex_Sans, Martian_Mono } from 'next/font/google';
 
+import { ThemeProvider } from '@/components/ThemeToggle';
+
 import './globals.css';
 
 const display = Martian_Mono({ subsets: ['latin'], weight: ['600', '700'], variable: '--font-martian' });
@@ -38,7 +40,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>
-      <body>{children}</body>
+      <body>
+        <ThemeProvider>{children}</ThemeProvider>
+      </body>
     </html>
   );
 }

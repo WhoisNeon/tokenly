@@ -234,109 +234,121 @@ export function PricingEditor({
             below. Edit them in the config file to change them.
           </p>
         )}
+      </div>
 
-        <div className="table-scroll">
-          <table className="pricing__table">
-            <thead>
-              <tr>
-                <th scope="col">Model</th>
-                <th scope="col">Input</th>
-                <th scope="col">Output</th>
-                <th scope="col">Cache read</th>
-                <th scope="col">Cache write</th>
-                <th scope="col">
-                  <span className="sr-only">Remove</span>
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {drafts.map((draft, index) => (
-                <tr key={index}>
-                  <td className="pricing__model">
+      <div className="table-scroll">
+        <table className="pricing__table">
+          <thead>
+            <tr>
+              <th scope="col">Model</th>
+              <th scope="col">Input</th>
+              <th scope="col">Output</th>
+              <th scope="col">Cache read</th>
+              <th scope="col">Cache write</th>
+              <th scope="col">
+                <span className="sr-only">Remove</span>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {drafts.map((draft, index) => (
+              <tr key={index}>
+                <td className="pricing__model">
+                  <input
+                    type="text"
+                    value={draft.model}
+                    placeholder="model-name"
+                    aria-label="Model name"
+                    spellCheck={false}
+                    autoComplete="off"
+                    onChange={(event) => edit(index, 'model', event.target.value)}
+                  />
+                </td>
+                {FIELDS.map((field) => (
+                  <td key={field}>
                     <input
-                      type="text"
-                      value={draft.model}
-                      placeholder="model-name"
-                      aria-label="Model name"
+                      type="number"
+                      inputMode="decimal"
+                      className="pricing__num"
+                      value={draft[field]}
+                      placeholder="0"
+                      step="0.01"
+                      aria-label={`${draft.model || 'model'} ${field} price`}
                       spellCheck={false}
                       autoComplete="off"
-                      onChange={(event) => edit(index, 'model', event.target.value)}
+                      onChange={(event) => edit(index, field, event.target.value)}
                     />
                   </td>
-                  {FIELDS.map((field) => (
-                    <td key={field}>
-                      <input
-                        type="text"
-                        inputMode="decimal"
-                        className="pricing__num"
-                        value={draft[field]}
-                        placeholder="0"
-                        aria-label={`${draft.model || 'model'} ${field} price`}
-                        spellCheck={false}
-                        autoComplete="off"
-                        onChange={(event) => edit(index, field, event.target.value)}
-                      />
-                    </td>
-                  ))}
-                  <td className="pricing__remove">
-                    <button
-                      type="button"
-                      className="btn btn--icon"
-                      aria-label={`Remove ${draft.model || 'model'}`}
-                      title="Remove"
-                      onClick={() => remove(index)}
-                    >
-                      <Trash2 size={13} aria-hidden="true" />
-                    </button>
-                  </td>
-                </tr>
+                ))}
+                <td className="pricing__remove">
+                  <button
+                    type="button"
+                    className="btn btn--icon"
+                    aria-label={`Remove ${draft.model || 'model'}`}
+                    title="Remove"
+                    onClick={() => remove(index)}
+                  >
+                    <Trash2 size={13} aria-hidden="true" />
+                  </button>
+                </td>
+              </tr>
+            ))}
+            {drafts.length === 0 && (
+              <tr>
+                <td colSpan={6} className="pricing__empty">
+                  No price overrides. ccusage is using its own table.
+                </td>
+              </tr>
+            )}
+          </tbody>
+          <tfoot>
+            <tr>
+              <th scope="row" className="row-head">
+                {drafts.length} model{drafts.length === 1 ? '' : 's'}
+              </th>
+              {FIELDS.map((field) => (
+                <td key={field} />
               ))}
-              {drafts.length === 0 && (
-                <tr>
-                  <td colSpan={6} className="pricing__empty">
-                    No price overrides. ccusage is using its own table.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+              <td />
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+
+      <div className="pricing__actions">
+        <button type="button" className="btn" onClick={() => add()}>
+          <Plus size={13} aria-hidden="true" />
+          Add model
+        </button>
+
+        <div className="pricing__status" role="status" aria-live="polite">
+          {saveError && (
+            <span className="pricing__error">
+              <CircleAlert size={13} aria-hidden="true" />
+              {saveError}
+            </span>
+          )}
+          {!saveError && saved && (
+            <span className="pricing__ok">
+              <CircleCheck size={13} aria-hidden="true" />
+              Saved
+            </span>
+          )}
         </div>
 
-        <div className="pricing__actions">
-          <button type="button" className="btn" onClick={() => add()}>
-            <Plus size={13} aria-hidden="true" />
-            Add model
-          </button>
-
-          <div className="pricing__status" role="status" aria-live="polite">
-            {saveError && (
-              <span className="pricing__error">
-                <CircleAlert size={13} aria-hidden="true" />
-                {saveError}
-              </span>
-            )}
-            {!saveError && saved && (
-              <span className="pricing__ok">
-                <CircleCheck size={13} aria-hidden="true" />
-                Saved
-              </span>
-            )}
-          </div>
-
-          <button
-            type="button"
-            className="btn btn--primary"
-            disabled={!dirty || saving}
-            onClick={save}
-          >
-            {saving ? (
-              <LoaderCircle className="spin" size={13} aria-hidden="true" />
-            ) : (
-              <Save size={13} aria-hidden="true" />
-            )}
-            Save prices
-          </button>
-        </div>
+        <button
+          type="button"
+          className="btn btn--primary"
+          disabled={!dirty || saving}
+          onClick={save}
+        >
+          {saving ? (
+            <LoaderCircle className="spin" size={13} aria-hidden="true" />
+          ) : (
+            <Save size={13} aria-hidden="true" />
+          )}
+          Save prices
+        </button>
       </div>
     </section>
   );

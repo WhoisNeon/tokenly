@@ -1,3 +1,4 @@
+import { SourceIcon } from '@/components/SourceIcon';
 import { formatCost, formatExact, formatMonth, formatShortDate } from '@/lib/format';
 import type { UsageRow, UsageTotals, View } from '@/lib/types';
 
@@ -36,7 +37,13 @@ export function UsageTable({
             <tr key={row.period}>
               <th scope="row" className="row-head">
                 {daily ? formatShortDate(row.period) : formatMonth(row.period)}
-                {row.agents.length > 0 && <span className="chip">{row.agents.join(' · ')}</span>}
+                {row.agents.length > 0 && (
+                  <span className="chip chip--agents" title={row.agents.join(', ')}>
+                    {row.agents.map((agent) => (
+                      <SourceIcon key={agent} source={agent} />
+                    ))}
+                  </span>
+                )}
               </th>
               {daily && (
                 <>

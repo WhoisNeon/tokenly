@@ -72,10 +72,11 @@ place to live.
       token chart with a cost toggle; and every active day, itemized.</sub>
     </td>
     <td width="50%" valign="top">
-      <img src="docs/screenshots/settings.png" alt="Tokenly pricing settings with editable per-million rates and a detected-models panel" />
+      <img src="docs/screenshots/dashboard-dark.png" alt="The daily report in the dark theme: a near-black page with the ink panels turned to cream" />
       <br />
-      <sub><strong>Pricing settings.</strong> Edit ccusage overrides per 1M tokens, see
-      which models ran recently, and save with a backup of the previous config.</sub>
+      <sub><strong>Dark theme, same tokens.</strong> The palette inverts — the deep-green
+      panels of the light theme turn cream on a near-black page — and the header toggle
+      moves between them with a circular reveal.</sub>
     </td>
   </tr>
   <tr>
@@ -86,19 +87,10 @@ place to live.
       the agents you actually use, with the token volume for the current window.</sub>
     </td>
     <td width="50%" valign="top">
-      <img src="docs/screenshots/mobile.png" alt="Tokenly on a phone: compact header, report controls, and stacked metrics" />
+      <img src="docs/screenshots/settings.png" alt="Tokenly pricing settings with editable per-million rates and a detected-models panel" />
       <br />
-      <sub><strong>Same ledger, smaller glass.</strong> The layout collapses to a sticky
-      top bar, one-column controls, and horizontally scrollable tables.</sub>
-    </td>
-  </tr>
-  <tr>
-    <td colspan="2" valign="top">
-      <img src="docs/screenshots/dashboard-dark.png" alt="The daily report in the dark theme: a near-black page with the ink panels turned to cream" />
-      <br />
-      <sub><strong>Dark theme, same tokens.</strong> The palette inverts — the deep-green
-      panels of the light theme turn cream on a near-black page — and the header toggle
-      moves between them with a circular reveal.</sub>
+      <sub><strong>Pricing settings.</strong> Edit ccusage overrides per 1M tokens, see
+      which models ran recently, and save with a backup of the previous config.</sub>
     </td>
   </tr>
 </table>

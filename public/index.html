@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="theme-color" content="#f1ede2" />
+    <meta
+      name="description"
+      content="Tokenly is a private, local dashboard for coding agent token usage, powered by ccusage."
+    />
+    <title>Tokenly — local token ledger</title>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link
+      rel="preload"
+      href="/fonts/instrument-serif-400.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+    <link
+      rel="preload"
+      href="/fonts/instrument-sans-var.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+    <link rel="stylesheet" href="/styles.css" />
+    <script type="module" src="/app.js"></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main-content">Skip to content</a>
+    <div id="app">
+      <div class="boot-screen" role="status" aria-live="polite">
+        <span class="boot-mark" aria-hidden="true">
+          <span></span><span></span><span></span>
+        </span>
+        <span class="boot-word">tokenly</span>
+        <span class="boot-message">Opening the local ledger…</span>
+      </div>
+    </div>
+    <div id="toast-region" class="toast-region" aria-live="polite" aria-atomic="false"></div>
+    <noscript>
+      <div class="noscript-message">
+        Tokenly needs JavaScript enabled to draw its local dashboard.
+      </div>
+    </noscript>
+  </body>
+</html>

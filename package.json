@@ -1,0 +1,15 @@
+{
+  "name": "tokenly",
+  "version": "1.0.0",
+  "private": true,
+  "description": "A local dashboard for coding agent token usage, powered by ccusage.",
+  "type": "module",
+  "scripts": {
+    "start": "node server.mjs",
+    "dev": "node --watch server.mjs",
+    "test": "node test/tokenly.test.mjs"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

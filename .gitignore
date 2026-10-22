@@ -1,0 +1,7 @@
+node_modules/
+.npm-cache/
+.chrome-*/
+test/.tmp/
+test/*.png
+*.log
+.DS_Store
